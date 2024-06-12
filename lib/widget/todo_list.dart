@@ -3,11 +3,16 @@ import 'package:todolist/models/todolist_model.dart';
 import 'package:todolist/widget/todo_item.dart';
 
 class TodoList extends StatefulWidget {
-  const TodoList(
-      {super.key, required this.todolist, required this.onRemoveTodo});
+  const TodoList({
+    super.key,
+    required this.todolist,
+    required this.onRemoveTodo,
+    required this.onUpdateTodo,
+  });
 
   final List<TodolistModel> todolist;
   final Function(int) onRemoveTodo;
+  final Function(int, TodolistModel)? onUpdateTodo;
 
   @override
   State<TodoList> createState() => _TodoListState();
@@ -25,8 +30,8 @@ class _TodoListState extends State<TodoList> {
           child: Container(
             margin: const EdgeInsets.all(6),
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
               color: Colors.red,
             ),
             child: const Row(
@@ -44,6 +49,8 @@ class _TodoListState extends State<TodoList> {
         },
         child: TodoItem(
           todo: todolist[index],
+          index: index,
+          onUpdateTodo: widget.onUpdateTodo,
         ),
       ),
     );

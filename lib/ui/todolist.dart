@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todolist/models/todolist_model.dart';
 import 'package:todolist/services/todolist_service.dart';
-import 'package:todolist/ui/add_todo_form.dart';
+import 'package:todolist/ui/todo_form.dart';
 import 'package:todolist/widget/todo_list.dart';
 
 class Todolist extends StatefulWidget {
@@ -18,7 +18,7 @@ class _TodolistState extends State<Todolist> {
       isScrollControlled: true,
       context: context,
       builder: (ctx) {
-        return AddTodoForm(onAddTodo: _addTodo);
+        return TodoForm(onAddTodo: _addTodo);
       },
     );
   }
@@ -32,6 +32,12 @@ class _TodolistState extends State<Todolist> {
   void _removeTodo(int index) {
     setState(() {
       TodolistService().remove(index);
+    });
+  }
+
+  void _updateTodo(int index, TodolistModel todolistModel) {
+    setState(() {
+      TodolistService().update(index, todolistModel);
     });
   }
 
@@ -58,6 +64,7 @@ class _TodolistState extends State<Todolist> {
           child: TodoList(
             todolist: data,
             onRemoveTodo: _removeTodo,
+            onUpdateTodo: _updateTodo,
           ),
         ),
       ),

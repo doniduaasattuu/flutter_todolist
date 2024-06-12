@@ -17,14 +17,18 @@ class HeaderTodo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        color: done == false ? null : Colors.red,
-        fontSize: size,
-        fontWeight: weight,
-        decoration:
-            done == false ? TextDecoration.none : TextDecoration.lineThrough,
+    return SizedBox(
+      width: 250,
+      child: Text(
+        overflow: TextOverflow.ellipsis,
+        text,
+        style: TextStyle(
+          color: done == false ? null : Colors.red,
+          fontSize: size,
+          fontWeight: weight,
+          decoration:
+              done == false ? TextDecoration.none : TextDecoration.lineThrough,
+        ),
       ),
     );
   }

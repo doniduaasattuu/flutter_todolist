@@ -3,16 +3,25 @@ import 'package:todolist/models/todolist_model.dart';
 import 'package:todolist/utility/utility.dart';
 import 'package:todolist/widget/custom_text.dart';
 
-class AddTodoForm extends StatefulWidget {
-  const AddTodoForm({super.key, required this.onAddTodo});
+class TodoForm extends StatefulWidget {
+  const TodoForm({
+    super.key,
+    this.index,
+    this.todo,
+    this.onAddTodo,
+    this.onUpdateTodo,
+  });
 
-  final Function(TodolistModel) onAddTodo;
+  final int? index;
+  final TodolistModel? todo;
+  final Function(TodolistModel)? onAddTodo;
+  final Function(int, TodolistModel)? onUpdateTodo;
 
   @override
-  State<AddTodoForm> createState() => _AddTodoFormState();
+  State<TodoForm> createState() => _TodoFormState();
 }
 
-class _AddTodoFormState extends State<AddTodoForm> {
+class _TodoFormState extends State<TodoForm> {
   final TextEditingController _todoController = TextEditingController();
   bool _done = false;
   DateTime _createdAt = DateTime.now();
@@ -38,6 +47,13 @@ class _AddTodoFormState extends State<AddTodoForm> {
 
   @override
   Widget build(BuildContext context) {
+    final TodolistModel? todoObject = widget.todo;
+    final int? index = widget.index;
+
+    if (todoObject != null) {
+      _todoController.text = todoObject.todo;
+    }
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -53,8 +69,8 @@ class _AddTodoFormState extends State<AddTodoForm> {
                     },
                     icon: const Icon(Icons.close),
                   ),
-                  const CustomText(
-                    text: 'Add Todo',
+                  CustomText(
+                    text: todoObject == null ? 'Add Todo' : 'Update Todo',
                     weight: FontWeight.w600,
                     size: 16,
                   ),
@@ -78,7 +94,7 @@ class _AddTodoFormState extends State<AddTodoForm> {
                 Row(
                   children: [
                     DropdownButton(
-                      value: _done,
+                      value: todoObject == null ? _done : todoObject.done,
                       items: const [
                         DropdownMenuItem(
                           value: false,
@@ -98,7 +114,9 @@ class _AddTodoFormState extends State<AddTodoForm> {
                     const Spacer(),
                     Wrap(
                       children: [
-                        Text(formatter.format(_createdAt)),
+                        Text(todoObject == null
+                            ? formatter.format(_createdAt)
+                            : formatter.format(todoObject.createdAt)),
                         const SizedBox(width: 16),
                         GestureDetector(
                           onTap: () {
@@ -128,21 +146,37 @@ class _AddTodoFormState extends State<AddTodoForm> {
                   color: Colors.red,
                 ),
               ),
+              const SizedBox(width: 8),
               ElevatedButton(
                 onPressed: () {
-                  final String todo = _todoController.text;
+                  final String stringTodo = _todoController.text;
 
-                  if (todo.isNotEmpty) {
-                    widget.onAddTodo(
-                      TodolistModel(
-                        todo: todo,
-                        done: _done,
-                        createdAt: _createdAt,
-                        updatedAt: _updatedAt,
-                      ),
-                    );
+                  if (stringTodo.isNotEmpty) {
+                    if (todoObject == null) {
+                      widget.onAddTodo!(
+                        TodolistModel(
+                          todo: stringTodo,
+                          done: _done,
+                          createdAt: _createdAt,
+                          updatedAt: _updatedAt,
+                        ),
+                      );
 
-                    Navigator.pop(context);
+                      Navigator.pop(context);
+                    } else {
+                      // update todo
+                      widget.onUpdateTodo!(
+                        index!,
+                        TodolistModel(
+                          todo: stringTodo,
+                          done: _done,
+                          createdAt: _createdAt,
+                          updatedAt: _updatedAt,
+                        ),
+                      );
+
+                      Navigator.pop(context);
+                    }
                   } else {
                     showDialog(
                       context: context,
@@ -164,8 +198,8 @@ class _AddTodoFormState extends State<AddTodoForm> {
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple),
-                child: const CustomText(
-                  text: 'Save',
+                child: CustomText(
+                  text: todoObject == null ? 'Save' : 'Update',
                   color: Colors.white,
                 ),
               ),
