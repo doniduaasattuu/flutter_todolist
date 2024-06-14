@@ -23,7 +23,7 @@ class TodoForm extends StatefulWidget {
 
 class _TodoFormState extends State<TodoForm> {
   final TextEditingController _todoController = TextEditingController();
-  bool _done = false;
+  bool? _done;
   DateTime _createdAt = DateTime.now();
   DateTime _updatedAt = DateTime.now();
 
@@ -52,6 +52,7 @@ class _TodoFormState extends State<TodoForm> {
 
     if (todoObject != null) {
       _todoController.text = todoObject.todo;
+      _done = _done ?? todoObject.done;
     }
 
     return Padding(
@@ -72,7 +73,7 @@ class _TodoFormState extends State<TodoForm> {
                   CustomText(
                     text: todoObject == null ? 'Add Todo' : 'Update Todo',
                     weight: FontWeight.w600,
-                    size: 16,
+                    size: 22,
                   ),
                 ],
               ),
@@ -94,7 +95,9 @@ class _TodoFormState extends State<TodoForm> {
                 Row(
                   children: [
                     DropdownButton(
-                      value: todoObject == null ? _done : todoObject.done,
+                      value: todoObject != null && _done == null
+                          ? todoObject.done
+                          : _done,
                       items: const [
                         DropdownMenuItem(
                           value: false,
@@ -151,12 +154,12 @@ class _TodoFormState extends State<TodoForm> {
                 onPressed: () {
                   final String stringTodo = _todoController.text;
 
-                  if (stringTodo.isNotEmpty) {
+                  if (stringTodo.isNotEmpty && _done != null) {
                     if (todoObject == null) {
                       widget.onAddTodo!(
                         TodolistModel(
                           todo: stringTodo,
-                          done: _done,
+                          done: _done!,
                           createdAt: _createdAt,
                           updatedAt: _updatedAt,
                         ),
@@ -169,7 +172,7 @@ class _TodoFormState extends State<TodoForm> {
                         index!,
                         TodolistModel(
                           todo: stringTodo,
-                          done: _done,
+                          done: _done!,
                           createdAt: _createdAt,
                           updatedAt: _updatedAt,
                         ),
@@ -183,7 +186,7 @@ class _TodoFormState extends State<TodoForm> {
                       builder: (ctx) => AlertDialog(
                         title: const Text('Input is invalid'),
                         content: const Text(
-                            'Please make sure the todo you\'ve entered is valid.'),
+                            'Please make sure the data you\'ve entered is valid.'),
                         actions: [
                           TextButton(
                             onPressed: () {
